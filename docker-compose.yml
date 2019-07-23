@@ -1,0 +1,28 @@
+version: "3.7"
+
+x-cli-config: &x-cli-config
+  build: .
+  network_mode: bridge
+  image: facts
+  volumes:
+    - ".:/facts"
+
+services:
+  facts: # the main CLI
+    <<: *x-cli-config
+  poetry:
+    <<: *x-cli-config
+    entrypoint: ["poetry"]
+  lint:
+    <<: *x-cli-config
+    entrypoint: ["black"]
+    command: ["."]
+  unit:
+    <<: *x-cli-config
+    entrypoint: ["pytest"]
+  python:
+    <<: *x-cli-config
+    entrypoint: ["python"]
+  bash:
+    <<: *x-cli-config
+    entrypoint: ["bash"]

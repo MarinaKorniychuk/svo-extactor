@@ -1,0 +1,68 @@
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""  # https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
+  LOCAL_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH/fact-extract
+  REMOTE_IMAGE: 516380634521.dkr.ecr.us-east-1.amazonaws.com/nlp/fact-extract
+
+stages:
+  - build
+  - test
+  - deploy
+
+services:
+  - docker:dind
+
+.run-on-docker: &run-on-docker
+  image: docker:stable
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - apk add py-pip
+    - pip install awscli
+    - eval "$(aws ecr get-login --no-include-email --region=us-east-1)"
+
+.run-on-image: &run-on-image
+  image:
+    name: $LOCAL_IMAGE:$CI_COMMIT_REF_SLUG
+    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - cd /facts  # from Dockerfile
+
+## Build
+
+build:
+  <<: *run-on-docker
+  stage: build
+  script:
+    - docker pull $LOCAL_IMAGE:latest || true
+    - docker build --cache-from $LOCAL_IMAGE:latest --tag $LOCAL_IMAGE:$CI_COMMIT_REF_SLUG --tag $LOCAL_IMAGE:latest .
+    - docker push $LOCAL_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $LOCAL_IMAGE:latest
+
+## Test
+
+unit:
+  <<: *run-on-image
+  stage: test
+  script:
+    - pytest
+
+lint:
+  <<: *run-on-image
+  stage: test
+  script:
+    - black --check .
+
+## Deploy
+
+deploy:
+  <<: *run-on-docker
+  only:
+    - master
+  stage: deploy
+  script:
+    - docker pull $LOCAL_IMAGE:$CI_COMMIT_SHA
+    - docker tag $LOCAL_IMAGE:$CI_COMMIT_SHA $REMOTE_IMAGE:latest
+    - docker push $REMOTE_IMAGE:latest

@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+*$py.class
+
+# C extensions
+*.so
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/**/*
+
+# Scrapy stuff:
+.scrapy
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+.DS_Store
+.idea
+
+# repo files
+.git
+.gitignore
+.gitlab-ci.yml
