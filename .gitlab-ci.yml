@@ -23,7 +23,7 @@ services:
 
 .run-on-image: &run-on-image
   image:
-    name: $LOCAL_IMAGE:$CI_COMMIT_REF_SLUG
+    name: $LOCAL_IMAGE:$CI_COMMIT_SHA
     entrypoint: [""]
   variables:
     GIT_STRATEGY: none
@@ -37,8 +37,8 @@ build:
   stage: build
   script:
     - docker pull $LOCAL_IMAGE:latest || true
-    - docker build --cache-from $LOCAL_IMAGE:latest --tag $LOCAL_IMAGE:$CI_COMMIT_REF_SLUG --tag $LOCAL_IMAGE:latest .
-    - docker push $LOCAL_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker build --cache-from $LOCAL_IMAGE:latest --tag $LOCAL_IMAGE:$CI_COMMIT_SHA --tag $LOCAL_IMAGE:latest .
+    - docker push $LOCAL_IMAGE:$CI_COMMIT_SHA
     - docker push $LOCAL_IMAGE:latest
 
 ## Test
