@@ -12,3 +12,8 @@ LOG_LEVEL = "INFO"
 
 # Destination settings
 OUTPUT_FILE_TEMPLATE = "data/{source}/{filename}"
+
+# nlp settings
+
+# test set of words to exclude from default stop words list
+NOT_STOP_WORDS = ["is", "are", "be", "take", "make"]
