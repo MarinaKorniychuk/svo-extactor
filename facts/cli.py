@@ -5,6 +5,7 @@ import click
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
+from facts.extractors import SVOExtractor
 from facts.settings import FEED_URI_TEMPLATE, OUTPUT_FILE_TEMPLATE
 
 from . import __doc__
@@ -40,7 +41,9 @@ def extract(output_file, source):
     process.start()
 
     # extracting svo triples
-    pass
+    fetched_data = [item for item in csv.DictReader(open(raw_path))]
+    svo_handler = SVOExtractor()
+    svo_triples = svo_handler.process(fetched_data)
 
     # saving svo triples to file
     pass
