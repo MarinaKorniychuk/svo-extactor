@@ -1,19 +1,24 @@
+# -*- coding: utf-8 -*-
 """Common settings and globals."""
 
-# Scrapy Settings
+# ===== SCRAPY =====
+
 SPIDER_MODULES = ["facts.spiders"]
+
 FEED_URI_TEMPLATE = "data/{source}/raw/{filename}"
 FEED_FORMAT = "csv"
 
-HTTPCACHE_ENABLED = True
-RETRY_TIMES = 3
-
 LOG_LEVEL = "INFO"
 
-# Destination settings
-OUTPUT_FILE_TEMPLATE = "data/{source}/{filename}"
 
-# nlp settings
+# ===== REQUESTS =====
+
+HTTPCACHE_ENABLED = True
+DOWNLOAD_DELAY = 0.2
+RETRY_TIMES = 3
+
+
+# ===== SPACY =====
 
 # words to exclude from default spacy stop words list
 NOT_STOP_WORDS = [
@@ -65,3 +70,9 @@ NOT_STOP_WORDS = [
     "give",
     "not",
 ]
+
+
+# ===== EXPORTING =====
+
+# Destination settings
+OUTPUT_FILE_TEMPLATE = "data/{source}/{filename}"
