@@ -43,3 +43,7 @@ venv.bak/
 .git
 .gitignore
 .gitlab-ci.yml
+
+# Docker
+Dockerfile
+docker-compose.yml

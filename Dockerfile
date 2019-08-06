@@ -1,34 +1,41 @@
-FROM 516380634521.dkr.ecr.us-east-1.amazonaws.com/ner/prodigy:1.8.3-2
-
+FROM python:3.7.4-slim as python-base
 ENV PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=0.12.11
+    POETRY_PATH=/opt/poetry \
+    VENV_PATH=/opt/venv \
+    POETRY_VERSION=0.12.17
+ENV PATH="$POETRY_PATH/bin:$VENV_PATH/bin:$PATH"
 
-WORKDIR /facts
-
-RUN savedAptMark="$(apt-mark showmanual)" \
-    && apt-get update \
-    && apt-get install -y curl --no-install-recommends \
+FROM python-base as poetry
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+        # deps for installing poetry
+        curl \
+        # deps for building python deps
+        build-essential \
     \
-    && apt-get -y install gcc mono-mcs \
-    && apt-get -y install python-dev python3-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev \
-    && apt-get -y install g++ \
-    && rm -rf /var/lib/apt/lists \
+    # install poetry - uses $POETRY_VERSION internally
+    && curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python \
+    && mv /root/.poetry $POETRY_PATH \
+    && poetry --version \
     \
-    && curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py > get-poetry.py \
-    && python get-poetry.py --version $POETRY_VERSION \
-    && ln -s $HOME/.poetry/bin/poetry /usr/local/bin/poetry \
-	&& poetry --version \
+    # configure poetry & make a virtualenv ahead of time since we only need one
+    && python -m venv $VENV_PATH \
+    && poetry config settings.virtualenvs.create false \
     \
-    && rm -f get-poetry.py \
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+    # cleanup
+    && rm -rf /var/lib/apt/lists/*
 
 COPY poetry.lock pyproject.toml ./
+RUN poetry install --no-interaction --no-ansi -vvv
 
-RUN poetry config settings.virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi -vvv
+FROM python-base as runtime
+WORKDIR /facts
 
+COPY --from=poetry $POETRY_PATH $POETRY_PATH
+RUN poetry config settings.virtualenvs.create false
+COPY --from=poetry $VENV_PATH $VENV_PATH
 COPY . ./
 
 ENTRYPOINT ["python", "-m", "facts"]

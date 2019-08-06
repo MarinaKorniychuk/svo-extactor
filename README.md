@@ -46,11 +46,6 @@ Remember to rebuild the image so that subsequent calls to `docker-compose` will 
 $ docker-compose build facts
 ```
 
-Since the Docker image is built off of the [prodigy-docker](https://github.com/fintechstudios/prodigy-docker) image, your
-environment will also implicitly have access to all the packages installed there. Keep this in mind, as there may be
-version conflicts when you add dependencies.
-
-
 ### Lint
 Strict code style is enforced through [`black`](https://github.com/psf/black). Code that does
 not pass linting will not be accepted. [Editor integrations](https://black.readthedocs.io/en/stable/editor_integration.html)
