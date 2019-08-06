@@ -11,6 +11,11 @@ RUN savedAptMark="$(apt-mark showmanual)" \
     && apt-get update \
     && apt-get install -y curl --no-install-recommends \
     \
+    && apt-get -y install gcc mono-mcs \
+    && apt-get -y install python-dev python3-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev \
+    && apt-get -y install g++ \
+    && rm -rf /var/lib/apt/lists \
+    \
     && curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py > get-poetry.py \
     && python get-poetry.py --version $POETRY_VERSION \
     && ln -s $HOME/.poetry/bin/poetry /usr/local/bin/poetry \
