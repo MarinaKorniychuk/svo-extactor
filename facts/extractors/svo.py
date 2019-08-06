@@ -21,7 +21,9 @@ class SVOExtractor(object):
         return svo_triples
 
     def process_item(self, item):
-        text_tokens = itertools.chain.from_iterable([sent for sent in self.nlp(item["text"]).sents][:2])
+        text_tokens = itertools.chain.from_iterable(
+            [sent for sent in self.nlp(item["text"]).sents][:2]
+        )
 
         filtered_tokens = [token.text for token in text_tokens if not token.is_stop]
         filtered_doc = self.nlp(" ".join(w for w in filtered_tokens))
