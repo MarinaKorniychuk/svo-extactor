@@ -36,6 +36,10 @@ WORKDIR /facts
 COPY --from=poetry $POETRY_PATH $POETRY_PATH
 RUN poetry config settings.virtualenvs.create false
 COPY --from=poetry $VENV_PATH $VENV_PATH
+
+RUN python -m spacy download en
+
 COPY . ./
+
 
 ENTRYPOINT ["python", "-m", "facts"]
