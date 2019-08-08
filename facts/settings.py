@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from os import environ
+
 """Common settings and globals."""
 
 # ===== SCRAPY =====
@@ -76,3 +78,5 @@ NOT_STOP_WORDS = [
 
 # Destination settings
 OUTPUT_FILE_TEMPLATE = "data/{source}/{filename}"
+
+DEBUG = environ.get("DEBUG", False)

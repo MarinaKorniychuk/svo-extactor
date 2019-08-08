@@ -1,0 +1,56 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "simple": {
+            "format": "%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+            "datefmt": "%y-%m-%d %H:%M:%S"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "simple",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "facts": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
+        },
+        "investopedia": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
+        },
+        "svo-extractor": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
+        },
+        "csv-exporter": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
+        },
+        "scrapy.statscollectors": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
+        },
+        "scrapy.core.scraper": {
+            "level": "WARNING",
+            "handlers": [
+                "console"
+            ]
+        }
+    }
+}
