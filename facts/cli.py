@@ -1,13 +1,19 @@
 import csv
+import logging
 
 import click
 
 from scrapy.crawler import CrawlerProcess
 
+from common.logging import setup_logging
 from common.utils import get_settings
 from facts.extractors import SVOExtractor
 
 from . import __doc__
+
+
+logger = logging.getLogger("facts")
+setup_logging()
 
 
 @click.group(help=__doc__)
@@ -29,9 +35,9 @@ def extract(output_file, source):
     """
     settings, raw_path, output_path = get_settings(output_file, source)
 
-
-    # fetching data from dictionary and saving to output file
-    process = CrawlerProcess(settings)
+    logger.info(f"Starting spider: {source}")
+    process = CrawlerProcess(settings, install_root_handler=False)
+    setup_logging()
     process.crawl(source)
     process.start()
 

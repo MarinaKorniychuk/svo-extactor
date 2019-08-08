@@ -1,3 +1,5 @@
+import logging
+
 import spacy
 import itertools
 import textacy.extract
@@ -15,9 +17,15 @@ class SVOExtractor(object):
         for w in NOT_STOP_WORDS:
             self.nlp.vocab[w].is_stop = False
 
+        self.logger = logging.getLogger("svo-extractor")
+
     def process(self, data):
+        self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
+        self.logger.info(f"Start extracting SVO triples")
+
         svo_triples = sum((self.process_item(item) for item in data), [])
 
+        self.logger.info(f"Finished extracting SVO triples from data")
         return svo_triples
 
     def process_item(self, item):
