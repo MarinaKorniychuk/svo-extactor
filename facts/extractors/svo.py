@@ -30,7 +30,7 @@ class SVOExtractor(object):
 
     def process_item(self, item):
         text_tokens = itertools.chain.from_iterable(
-            [sent for sent in self.nlp(item["text"]).sents][:2]
+            [sent for sent in self.nlp(item["text"].lower()).sents][:2]
         )
 
         filtered_tokens = [token.text for token in text_tokens if not token.is_stop]
@@ -40,11 +40,12 @@ class SVOExtractor(object):
         for svo in textacy.extract.subject_verb_object_triples(filtered_doc):
             svo_triples.append(
                 {
-                    "page": item["title"],
+                    "name": item["title"],
                     "subject": svo[0].lemma_,
                     "verb": svo[1].lemma_,
                     "object": svo[2].lemma_,
                     "url": item["url"],
+                    "definition": item["text"],
                 }
             )
 

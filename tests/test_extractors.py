@@ -28,7 +28,7 @@ class ExtractorSVOTestCase(TestCase):
         self.extractor = SVOExtractor()
 
     def test_svo_extraction(self):
-        keys = ["page", "subject", "verb", "object", "url"]
+        keys = ["name", "subject", "verb", "object", "url", "definition"]
         svo_triples = self.extractor.process(data)
         for svo in svo_triples:
             for key in keys:
