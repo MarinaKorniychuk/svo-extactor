@@ -7,7 +7,7 @@ from scrapy.crawler import CrawlerProcess
 
 from common.logging import setup_logging
 from common.utils import get_settings
-from facts.exporters import CSVExporter
+from facts.handlers import CSVHandler
 from facts.extractors import SVOExtractor
 
 from . import __doc__
@@ -42,14 +42,15 @@ def extract(output_file, source):
     process.crawl(source)
     process.start()
 
+    handler = CSVHandler()
+    extractor = SVOExtractor()
+
     # extracting svo triples
-    fetched_data = [item for item in csv.DictReader(open(raw_path))]
-    svo_handler = SVOExtractor()
-    svo_triples = svo_handler.process(fetched_data)
+    fetched_data = handler.read_from_file(raw_path)
+    svo_triples = extractor.process(fetched_data)
 
     # saving svo triples to file
-    exporter = CSVExporter()
-    exporter.export_to_file(svo_triples, output_path)
+    handler.export_to_file(svo_triples, output_path)
 
 
 __all__ = ["cli"]
