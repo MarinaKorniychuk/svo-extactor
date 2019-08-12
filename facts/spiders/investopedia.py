@@ -41,9 +41,9 @@ class InvestopediaSpider(scrapy.Spider):
             return
 
         yield {
-            "page_url": response.url,
-            "page_title": response.css("h1#article-heading_2-0::text").get().strip(),
+            "url": response.url,
+            "title": response.css("h1#article-heading_2-0::text").get().strip().lower(),
             "text": "".join(
                 response.css("#article-body_1-0 p")[0].css("p *::text").getall()
-            ).strip(),
+            ).lower(),
         }
