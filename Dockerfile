@@ -37,9 +37,10 @@ COPY --from=poetry $POETRY_PATH $POETRY_PATH
 RUN poetry config settings.virtualenvs.create false
 COPY --from=poetry $VENV_PATH $VENV_PATH
 
-RUN python -m spacy download en
+# stopgap for https://github.com/sdispater/poetry/issues/1297 - when fixed, install to pyproject.toml
+RUN pip install --no-cache-dir --no-deps \
+        https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.1.0/en_core_web_sm-2.1.0.tar.gz#egg=en_core_web_sm
 
 COPY . ./
-
 
 ENTRYPOINT ["python", "-m", "facts"]
