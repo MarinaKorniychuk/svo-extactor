@@ -34,7 +34,7 @@
                 "console"
             ]
         },
-        "csv-exporter": {
+        "csv-handler": {
             "level": "INFO",
             "handlers": [
                 "console"

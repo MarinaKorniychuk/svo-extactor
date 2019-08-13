@@ -6,7 +6,7 @@ class CSVHandler(object):
     """Read from and write to CSV files using Python’s Built-in CSV Library."""
 
     def __init__(self):
-        self.logger = logging.getLogger("csv-exporter")
+        self.logger = logging.getLogger("csv-handler")
 
     def read_from_file(self, file_path):
         self.logger.info(f"Start reading data from file {file_path}...")
