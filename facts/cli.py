@@ -34,7 +34,7 @@ def extract(output_file, source):
     """Run spider to crawl data from specified SOURCE (that is spider's name),
     call SVO extractor to generate SVO triples and save them to OUTPUT FILE.
     """
-    settings, raw_path, output_path = get_settings(output_file, source)
+    settings, raw_path, output_path = get_settings(source, output_file)
 
     logger.info(f"Starting spider: {source}")
     process = CrawlerProcess(settings, install_root_handler=False)
