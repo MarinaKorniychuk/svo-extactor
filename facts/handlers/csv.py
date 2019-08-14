@@ -11,10 +11,9 @@ class CSVHandler(object):
     def read_from_file(self, file_path):
         self.logger.info(f"Start reading data from file {file_path}...")
 
-        data = [item for item in csv.DictReader(open(file_path))]
-        self.logger.info(
-            f"Finished reading data ({len(data)} items) from csv file from file."
-        )
+        with open(file_path) as file:
+            data = [item for item in csv.DictReader(file)]
+        self.logger.info(f"Finished reading data ({len(data)} items) from csv file.")
         return data
 
     def export_to_file(self, data, file_path):

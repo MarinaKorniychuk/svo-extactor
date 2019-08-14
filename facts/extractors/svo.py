@@ -46,9 +46,8 @@ class SVOExtractor(object):
         - URL of the definition page
         - the original full text of the definition
         """
-        text_tokens = itertools.chain.from_iterable(
-            [sent for sent in self.nlp(item["text"].lower()).sents][:2]
-        )
+        sentences = [sent for sent in self.nlp(item["text"].lower()).sents][:2]
+        text_tokens = itertools.chain.from_iterable(sentences)
 
         filtered_text = [token.text for token in text_tokens if not token.is_stop]
         filtered_doc = self.nlp(" ".join(w for w in filtered_text))

@@ -1,4 +1,3 @@
-import csv
 import logging
 
 import click
@@ -11,10 +10,6 @@ from facts.handlers import CSVHandler
 from facts.extractors import SVOExtractor
 
 from . import __doc__
-
-
-logger = logging.getLogger("facts")
-setup_logging()
 
 
 @click.group(help=__doc__)
@@ -36,6 +31,7 @@ def extract(output_file, source):
     """
     settings, raw_path, output_path = get_settings(source, output_file)
 
+    logger = logging.getLogger("facts")
     logger.info(f"Starting spider: {source}")
     process = CrawlerProcess(settings, install_root_handler=False)
     setup_logging()

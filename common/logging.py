@@ -1,8 +1,12 @@
 import json
-import pathlib
+from pathlib import Path
 import logging.config
 
 from facts.settings import DEBUG
+
+
+CURRENT_FOLDER_PATH = Path(__file__).parent
+CONFIG_JSON_PATH = Path.joinpath(CURRENT_FOLDER_PATH, "logging.json")
 
 
 def setup_logging():
@@ -13,9 +17,7 @@ def setup_logging():
         install_root_handler=False to get logging from scrapy build-in
         loggers with useful logs (stats and crawling errors).
     """
-    with open(
-        pathlib.Path.joinpath(pathlib.Path(__file__).parent, "logging.json")
-    ) as f:
+    with open(CONFIG_JSON_PATH) as f:
         logging_config = json.load(f)
 
     if DEBUG:
