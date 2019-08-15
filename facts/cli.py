@@ -2,9 +2,9 @@ import logging
 
 import click
 
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerRunner
+from twisted.internet import reactor
 
-from common.logging import setup_logging
 from common.utils import get_settings
 from facts.handlers import CSVHandler
 from facts.extractors import SVOExtractor
@@ -29,14 +29,17 @@ def extract(output_file, source):
     """Run spider to crawl data from specified SOURCE (that is spider's name),
     call SVO extractor to generate SVO triples and save them to OUTPUT FILE.
     """
+    logger = logging.getLogger("facts")
     settings, raw_path, output_path = get_settings(source, output_file)
 
-    logger = logging.getLogger("facts")
+    # the reactor should be explicitly run and shut down after the crawling
+    # is finished (by adding callbacks to the deferred)
+    runner = CrawlerRunner(settings)
+    deferred = runner.crawl(source)
+    deferred.addBoth(lambda _: reactor.stop())
+
     logger.info(f"Starting spider: {source}")
-    process = CrawlerProcess(settings, install_root_handler=False)
-    setup_logging()
-    process.crawl(source)
-    process.start()
+    reactor.run()  # the script will block here until the crawling is finished
 
     handler = CSVHandler()
     extractor = SVOExtractor()
