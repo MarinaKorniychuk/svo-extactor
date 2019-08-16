@@ -1,11 +1,14 @@
 import logging
 from typing import Iterable
 
+import numpy
 import spacy
 import itertools
 import textacy.extract
+from spacy.attrs import LOWER, POS, ENT_TYPE, IS_ALPHA
+from spacy.tokens import Doc
 
-from facts.settings import NOT_STOP_WORDS
+from facts.settings import TOKENS_TO_FILTER
 
 
 class SVOExtractor(object):
@@ -24,6 +27,18 @@ class SVOExtractor(object):
 
         self.logger = logging.getLogger("svo-extractor")
 
+    def remove_tokens_on_match(self, doc):
+        """ """
+        inds = []
+        for index, token in enumerate(doc):
+            if token.pos_ in TOKENS_TO_FILTER and token.text != ".":
+                inds.append(index)
+        np_array = doc.to_array([LOWER, POS, ENT_TYPE, IS_ALPHA])
+        np_array = numpy.delete(np_array, inds, axis=0)
+        words = [t.text for i, t in enumerate(doc) if i not in inds]
+        doc2 = Doc(doc.vocab, words=words)
+        doc2.from_array([LOWER, POS, ENT_TYPE, IS_ALPHA], np_array)
+        return doc2
     def process(self, data: Iterable) -> list:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
         self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
