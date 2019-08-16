@@ -16,14 +16,14 @@ class SVOExtractor(object):
 
     def __init__(self):
         """Load and initialize spacy 'en' model,
-        add built-in pipeline component Sentencizer for sentence segmentation.
-        Update model's default list of stop words by removing words from NOT_STOP_WORDS list.
+        add built-in pipeline components for sentence segmentation and merging noun chunks and entities,
+        also add to pipeline custom component to filter stop words.
         """
         self.nlp = spacy.load("en_core_web_sm")
-        self.nlp.add_pipe(self.nlp.create_pipe("sentencizer"), first=True)
-
-        for w in NOT_STOP_WORDS:
-            self.nlp.vocab[w].is_stop = False
+        self.nlp.add_pipe(self.remove_tokens_on_match, name="filter", after="tagger")
+        self.nlp.add_pipe(self.nlp.create_pipe("sentencizer"), after="filter")
+        self.nlp.add_pipe(self.nlp.create_pipe("merge_noun_chunks"))
+        self.nlp.add_pipe(self.nlp.create_pipe("merge_entities"))
 
         self.logger = logging.getLogger("svo-extractor")
 
@@ -39,6 +39,7 @@ class SVOExtractor(object):
         doc2 = Doc(doc.vocab, words=words)
         doc2.from_array([LOWER, POS, ENT_TYPE, IS_ALPHA], np_array)
         return doc2
+
     def process(self, data: Iterable) -> list:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
         self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
@@ -61,11 +62,13 @@ class SVOExtractor(object):
         - URL of the definition page
         - the original full text of the definition
         """
-        sentences = [sent for sent in self.nlp(item["text"].lower()).sents][:2]
+        text = item["text"].lower()
+        doc = self.nlp(text, disable=["merge_noun_chunks", "merge_entities"])
+        sentences = [sent for sent in doc.sents][:2]
         text_tokens = itertools.chain.from_iterable(sentences)
+        text_words = [token.text_with_ws for token in text_tokens]
 
-        filtered_text = [token.text for token in text_tokens if not token.is_stop]
-        filtered_doc = self.nlp(" ".join(w for w in filtered_text))
+        filtered_doc = self.nlp("".join(w for w in text_words))
 
         svo_triples = []
         for svo in textacy.extract.subject_verb_object_triples(filtered_doc):
