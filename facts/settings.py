@@ -73,7 +73,7 @@ NOT_STOP_WORDS = [
     "not",
 ]
 
-TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PART", "PRON", "PROPN")
+TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON", "PROPN")
 
 
 # ===== EXPORTING =====
