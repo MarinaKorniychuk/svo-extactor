@@ -1,8 +1,11 @@
 import numpy as np
-from spacy.attrs import LOWER, POS, ENT_TYPE, IS_ALPHA, SENT_START
 from spacy.tokens import Doc
 
-from facts.settings import TOKENS_TO_FILTER
+from facts.settings import (
+    TOKENS_TO_FILTER,
+    FILTER_ATTRS_TO_EXPORT,
+    CROP_ATTRS_TO_EXPORT,
+)
 
 
 def remove_tokens_on_match(doc):
@@ -16,11 +19,11 @@ def remove_tokens_on_match(doc):
             if token.is_sent_start and len(doc) > index + 1:
                 doc[index + 1].is_sent_start = True
 
-    np_array = doc.to_array([LOWER, POS, ENT_TYPE, IS_ALPHA, SENT_START])
+    np_array = doc.to_array(FILTER_ATTRS_TO_EXPORT)
     np_array = np.delete(np_array, indices, axis=0)
     words = [t.text for i, t in enumerate(doc) if i not in indices]
     doc2 = Doc(doc.vocab, words=words)
-    doc2.from_array([LOWER, POS, ENT_TYPE, IS_ALPHA, SENT_START], np_array)
+    doc2.from_array(FILTER_ATTRS_TO_EXPORT, np_array)
     return doc2
 
 
@@ -30,7 +33,7 @@ def crop_to_two_sentences(doc):
 
     Note: should be added to pipeline after sentencizer,
     so that sentence boundaries are already set, but before parser component."""
-    np_array = doc.to_array(SENT_START)
+    np_array = doc.to_array(CROP_ATTRS_TO_EXPORT)
     sent_start_indices = np.where(np_array == 1)[0]
 
     if len(sent_start_indices) <= 2:
@@ -39,5 +42,5 @@ def crop_to_two_sentences(doc):
     fragment_len = sent_start_indices[2]
     words = [t.text for i, t in enumerate(doc[:fragment_len])]
     doc2 = Doc(doc.vocab, words=words)
-    doc2.from_array(SENT_START, np_array[:fragment_len])
+    doc2.from_array(CROP_ATTRS_TO_EXPORT, np_array[:fragment_len])
     return doc2
