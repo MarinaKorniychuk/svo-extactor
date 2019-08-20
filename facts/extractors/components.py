@@ -13,7 +13,7 @@ def remove_tokens_on_match(doc):
     for index, token in enumerate(doc):
         if token.pos_ in TOKENS_TO_FILTER:
             indices.append(index)
-            if token.is_sent_start:
+            if token.is_sent_start and len(doc) > index + 1:
                 doc[index + 1].is_sent_start = True
 
     np_array = doc.to_array([LOWER, POS, ENT_TYPE, IS_ALPHA, SENT_START])
