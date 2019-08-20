@@ -14,6 +14,9 @@ class SVOExtractor(object):
         """Load and initialize spacy 'en' model,
         add built-in pipeline components for sentence segmentation and merging noun chunks,
         also add to pipeline custom components to crop the paragraph and filter stop words.
+
+        Components' order in the pipeline is the following:
+        ['sentencizer', 'crop', 'tagger', 'filter', 'parser', 'merge_noun_chunks']
         """
         self.nlp = spacy.load("en_core_web_sm")
 
@@ -23,6 +26,8 @@ class SVOExtractor(object):
         # add custom components to pipeline
         self.nlp.add_pipe(crop_to_two_sentences, name="crop", after="sentencizer")
         self.nlp.add_pipe(remove_tokens_on_match, name="filter", after="tagger")
+
+        self.nlp.remove_pipe("ner")
 
         self.logger = logging.getLogger("svo-extractor")
 
