@@ -23,7 +23,7 @@ class InvestopediaSpiderTestCase(spider.SpiderTestCase):
         self.assertEqual(
             "Take a bath is a slang term that refers to an investor who has experienced a significant loss from "
             "an investment. Investors whose shares have declined substantially are said to have taken a bath. For "
-            "example, during the Great Recession between 2007 and 2009, or the crash of technology stocks in early "
+            "example, during the Great Recession between 2007 and 2009, or the crash of technology stocks in early "
             "2000, many investors, because of their large losses, were said to have taken a bath.",
             item["text"],
         )
