@@ -1,6 +1,7 @@
 import numpy as np
 from spacy.attrs import POS, SENT_START
 from spacy.tokens import Doc
+from spacy.util import filter_spans
 
 TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON")
 
@@ -44,3 +45,24 @@ def crop_to_two_sentences(doc):
     doc2 = Doc(doc.vocab, words=words)
     doc2.from_array(CROP_ATTRS_TO_EXPORT, np_array[:fragment_len])
     return doc2
+
+
+def filter_and_merge_noun_chunks(doc):
+    """Filter overlapping spans and merge noun chunks into a single token.
+
+    Component to replace build-in pipeline component merge_noun_chunks.
+    Filter a sequence of spans to remove duplicates or overlaps
+    before merging to avoid conflicting merges.
+    """
+    if not doc.is_parsed:
+        return doc
+
+    chunks = doc.noun_chunks
+    filtered_chunks = filter_spans(chunks)
+
+    with doc.retokenize() as retokenizer:
+        for ch in filtered_chunks:
+            attrs = {"tag": ch.root.tag, "dep": ch.root.dep, "pos": ch.root.pos}
+            retokenizer.merge(ch, attrs=attrs)
+
+    return doc

@@ -4,7 +4,11 @@ from typing import Iterable
 import spacy
 import textacy.extract
 
-from facts.extractors.components import crop_to_two_sentences, remove_tokens_on_match
+from facts.extractors.components import (
+    crop_to_two_sentences,
+    remove_tokens_on_match,
+    filter_and_merge_noun_chunks,
+)
 
 
 class SVOExtractor(object):
@@ -16,16 +20,15 @@ class SVOExtractor(object):
         also add to pipeline custom components to crop the paragraph and filter stop words.
 
         Components' order in the pipeline is the following:
-        ['sentencizer', 'crop', 'tagger', 'filter', 'parser', 'merge_noun_chunks']
+        ['sentencizer', 'crop', 'tagger', 'filter', 'parser', 'filter_and_merge_noun_chunks']
         """
         self.nlp = spacy.load("en_core_web_sm")
-
         self.nlp.add_pipe(self.nlp.create_pipe("sentencizer"), first=True)
-        self.nlp.add_pipe(self.nlp.create_pipe("merge_noun_chunks"))
 
         # add custom components to pipeline
         self.nlp.add_pipe(crop_to_two_sentences, name="crop", after="sentencizer")
         self.nlp.add_pipe(remove_tokens_on_match, name="filter", after="tagger")
+        self.nlp.add_pipe(filter_and_merge_noun_chunks)
 
         self.nlp.remove_pipe("ner")
 
