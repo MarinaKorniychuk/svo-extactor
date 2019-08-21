@@ -1,11 +1,11 @@
 import numpy as np
+from spacy.attrs import POS, SENT_START
 from spacy.tokens import Doc
 
-from facts.settings import (
-    TOKENS_TO_FILTER,
-    FILTER_ATTRS_TO_EXPORT,
-    CROP_ATTRS_TO_EXPORT,
-)
+TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON")
+
+FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
+CROP_ATTRS_TO_EXPORT = [SENT_START]
 
 
 def remove_tokens_on_match(doc):

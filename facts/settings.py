@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import environ
 
-from spacy.attrs import POS, SENT_START
-
 """Common settings and globals."""
 
 # ===== SCRAPY =====
@@ -20,14 +18,6 @@ LOG_LEVEL = "INFO"
 HTTPCACHE_ENABLED = True
 DOWNLOAD_DELAY = 0.2
 RETRY_TIMES = 3
-
-
-# ===== SPACY =====
-
-TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON")
-
-FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
-CROP_ATTRS_TO_EXPORT = [SENT_START]
 
 
 # ===== EXPORTING =====

@@ -3,7 +3,6 @@ from unittest import TestCase
 import spacy
 
 from facts.extractors.components import remove_tokens_on_match, crop_to_two_sentences
-from facts.settings import TOKENS_TO_FILTER
 
 LONG_TEXT = (
     "3c1 refers to a portion of the investment company act of 1940 that allows private funds to "
@@ -17,6 +16,8 @@ SHORT_TEXT = (
     "An abandonment clause in a property insurance contract, under certain circumstances, permits the "
     "property owner to abandon owner's lost or damaged property and still claim a full settlement amount."
 )
+
+TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON")
 
 
 class TestCropTo2Sentences(TestCase):
