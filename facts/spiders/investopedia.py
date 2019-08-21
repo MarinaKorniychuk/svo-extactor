@@ -36,14 +36,13 @@ class InvestopediaSpider(scrapy.Spider):
         # Request like this are redirected to other pages (e.g Investing Essentials)
         if response.meta.get("redirect_urls"):
             self.logger.warning(
-                f'Redirected (301) from <GET {response.url}> to <GET {response.meta["redirect_urls"][0] }>: SKIPPING'
+                f'Redirected (301) from <GET {response.meta["redirect_urls"][0]}> to <GET {response.url}>: SKIPPING'
             )
             return
 
+        text = "".join(response.css("#article-body_1-0 p")[0].css("p *::text").getall())
         yield {
-            "page_url": response.url,
-            "page_title": response.css("h1#article-heading_2-0::text").get().strip(),
-            "text": "".join(
-                response.css("#article-body_1-0 p")[0].css("p *::text").getall()
-            ).strip(),
+            "url": response.url,
+            "title": response.css("h1#article-heading_2-0::text").get().strip(),
+            "text": text.replace("\xa0", " ").strip(),
         }

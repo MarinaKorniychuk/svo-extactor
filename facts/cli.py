@@ -1,11 +1,13 @@
-from datetime import datetime
+import logging
 
 import click
 
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
+from scrapy.crawler import CrawlerRunner
+from twisted.internet import reactor
 
-from facts.settings import FEED_URI_TEMPLATE, OUTPUT_FILE_TEMPLATE
+from common.utils import get_settings
+from facts.handlers import CSVHandler
+from facts.extractors import SVOExtractor
 
 from . import __doc__
 
@@ -27,23 +29,27 @@ def extract(output_file, source):
     """Run spider to crawl data from specified SOURCE (that is spider's name),
     call SVO extractor to generate SVO triples and save them to OUTPUT FILE.
     """
-    output_file = output_file or datetime.now().strftime("auto%Y-%m-%dT%H:%M:%S.csv")
+    logger = logging.getLogger("facts")
+    settings, raw_path, output_path = get_settings(source, output_file)
 
-    raw_path = FEED_URI_TEMPLATE.format(source=source, filename=output_file)
-    output_path = OUTPUT_FILE_TEMPLATE.format(source=source, filename=output_file)
+    # the reactor should be explicitly run and shut down after the crawling
+    # is finished (by adding callbacks to the deferred)
+    runner = CrawlerRunner(settings)
+    deferred = runner.crawl(source)
+    deferred.addBoth(lambda _: reactor.stop())
 
-    # fetching data from dictionary and saving to output file
-    settings = get_project_settings()
-    settings["FEED_URI"] = raw_path
-    process = CrawlerProcess(settings)
-    process.crawl(source)
-    process.start()
+    logger.info(f"Starting spider: {source}")
+    reactor.run()  # the script will block here until the crawling is finished
+
+    handler = CSVHandler()
+    extractor = SVOExtractor()
 
     # extracting svo triples
-    pass
+    fetched_data = handler.read_from_file(raw_path)
+    svo_triples = extractor.process(fetched_data)
 
     # saving svo triples to file
-    pass
+    handler.export_to_file(svo_triples, output_path)
 
 
 __all__ = ["cli"]
