@@ -8,7 +8,7 @@ class InvestopediaSpiderTestCase(spider.SpiderTestCase):
 
     callback = InvestopediaSpider.parse_detail
     response_html = Path.joinpath(
-        Path(__file__).parent, "responses", "investopedia/detail.html"
+        Path(__file__).parent, "responses", f"{InvestopediaSpider.name}/detail.html"
     )
     url = "https://www.investopedia.com/terms/t/takeabath.asp"
 
