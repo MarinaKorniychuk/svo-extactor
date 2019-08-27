@@ -24,22 +24,30 @@ def cli():
     default=None,
     help="dump extracted items into OUTPUT FILE",
 )
+@click.option(
+    "--data_file",
+    required=False,
+    default=None,
+    help="read fetched items from DATA FILE instead of crawling from SOURCE",
+)
 @click.argument("source")
-def extract(output_file, source):
-    """Run spider to crawl data from specified SOURCE (that is spider's name),
+def extract(source, output_file, data_file):
+    """Run spider to crawl data from specified SOURCE (that is spider's name)
+    or simply read previously fetched data from specified DATA FILE,
     call SVO extractor to generate SVO triples and save them to OUTPUT FILE.
     """
     logger = logging.getLogger("facts")
-    settings, raw_path, output_path = get_settings(source, output_file)
+    settings, raw_path, output_path = get_settings(source, output_file, data_file)
 
-    # the reactor should be explicitly run and shut down after the crawling
-    # is finished (by adding callbacks to the deferred)
-    runner = CrawlerRunner(settings)
-    deferred = runner.crawl(source)
-    deferred.addBoth(lambda _: reactor.stop())
+    if not data_file:
+        # the reactor should be explicitly run and shut down after the crawling
+        # is finished (by adding callbacks to the deferred)
+        runner = CrawlerRunner(settings)
+        deferred = runner.crawl(source)
+        deferred.addBoth(lambda _: reactor.stop())
 
-    logger.info(f"Starting spider: {source}")
-    reactor.run()  # the script will block here until the crawling is finished
+        logger.info(f"Starting spider: {source}")
+        reactor.run()  # the script will block here until the crawling is finished
 
     handler = CSVHandler()
     extractor = SVOExtractor()
