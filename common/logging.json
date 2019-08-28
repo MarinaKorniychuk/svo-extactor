@@ -28,6 +28,12 @@
                 "console"
             ]
         },
+        "blacks_law": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
+        },
         "svo-extractor": {
             "level": "INFO",
             "handlers": [

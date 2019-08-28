@@ -55,7 +55,7 @@ class SVOExtractor(object):
         - URL of the definition page
         - the original full text of the definition
         """
-        text = item["text"].lower()
+        text = item["text"].replace("“", '"').replace("”", '"').lower()
         doc = self.nlp(text)
 
         svo_triples = []

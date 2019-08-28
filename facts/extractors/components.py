@@ -3,7 +3,7 @@ from spacy.attrs import POS, SENT_START
 from spacy.tokens import Doc
 from spacy.util import filter_spans
 
-TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON")
+TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON", "PART", "PROPN")
 
 FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
