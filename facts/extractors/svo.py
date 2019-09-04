@@ -8,6 +8,7 @@ from facts.extractors.components import (
     crop_to_two_sentences,
     remove_tokens_on_match,
     filter_and_merge_noun_chunks,
+    MergeTermNamesPipeline,
 )
 
 
@@ -28,16 +29,26 @@ class SVOExtractor(object):
         # add custom components to pipeline
         self.nlp.add_pipe(crop_to_two_sentences, name="crop", after="sentencizer")
         self.nlp.add_pipe(remove_tokens_on_match, name="filter", after="tagger")
-        self.nlp.add_pipe(filter_and_merge_noun_chunks)
+        self.nlp.add_pipe(filter_and_merge_noun_chunks, name="merge_chunks")
 
         self.nlp.remove_pipe("ner")
 
         self.logger = logging.getLogger("svo-extractor")
 
+    def add_merge_terms_pipeline(self, terms):
+        """Add TermNamesPipeline component to nlp model."""
+        merge_term_names = MergeTermNamesPipeline(self.nlp)
+        merge_term_names.add_patterns_to_match(terms)
+
+        self.nlp.add_pipe(merge_term_names, name="merge_terms", before="tagger")
+
     def process(self, data: Iterable) -> list:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
         self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
         self.logger.info(f"Start extracting SVO triples")
+
+        terms = [i["title"].lower() for i in data]
+        self.add_merge_terms_pipeline(terms)
 
         svo_triples = sum((self.process_item(item) for item in data), [])
 
