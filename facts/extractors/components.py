@@ -1,5 +1,8 @@
+import logging
+
 import numpy as np
-from spacy.attrs import POS, SENT_START
+from spacy.attrs import POS, SENT_START, LOWER
+from spacy.matcher import PhraseMatcher
 from spacy.tokens import Doc
 from spacy.util import filter_spans
 
@@ -7,6 +10,39 @@ TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON", "PART", "PROPN")
 
 FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
+
+
+class MergeTermNamesPipeline(object):
+    """Custom pipeline component that merges term names into single token.
+
+    Find matches for term names in doc and merge them into single token
+    to make sure term names will be correctly extracted in SVO triples.
+    """
+
+    def __init__(self, nlp):
+        self.nlp = nlp
+        self.logger = logging.getLogger("merge-terms-component")
+        self.phrase_matcher = PhraseMatcher(self.nlp.vocab, LOWER)
+
+    def __call__(self, doc):
+        matched_phrases = self.phrase_matcher(doc)
+
+        matched_spans = []
+        for match_id, start, end in matched_phrases:
+            matched_spans.append(doc[start:end])
+
+        filtered_spans = filter_spans(matched_spans)
+        with doc.retokenize() as retokenizer:
+            for span in filtered_spans:
+                retokenizer.merge(span)
+
+        return doc
+
+    def add_patterns_to_match(self, terms):
+        patterns = [
+            self.nlp(term, disable=["filter", "merge_chunks"]) for term in terms
+        ]
+        self.phrase_matcher.add("TN", None, *patterns)
 
 
 def remove_tokens_on_match(doc):
