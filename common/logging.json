@@ -57,6 +57,12 @@
             "handlers": [
                 "console"
             ]
+        },
+        "scrapy.extensions.feedexport": {
+            "level": "INFO",
+            "handlers": [
+                "console"
+            ]
         }
     }
 }

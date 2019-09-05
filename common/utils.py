@@ -1,26 +1,31 @@
 from datetime import datetime
+from pathlib import Path
 
 from scrapy.utils.project import get_project_settings
 
-from facts.settings import FEED_URI_TEMPLATE, OUTPUT_FILE_TEMPLATE
+from facts.settings import FEED_URI_TEMPLATE
 
 
-def get_settings(source, output_file=None):
+def get_svo_output_path(path):
+    """Return output_path that is destination for extracted SVO triples."""
+    path = Path(path)
+    output_path = path.with_name(f"{path.stem}-svo{path.suffix}")
+
+    return output_path
+
+
+def get_settings(output=None):
     """Call get_project_settings() to get settings from settings.py,
-    complete FEED_URI_TEMPLATE and OUTPUT_FILE_TEMPLATE strings and
-    and FEED_URI (which is raw_path) to settings dict.
+    complete FEED_URI_TEMPLATE and add FEED_URI (which is raw_path)
+    to settings dict.
 
     Returns:
         settings: dict to configure crawling
-        raw_path: destination for fetched original source data
-        output_path: destination for extracted final result
     """
-    output_file = output_file or datetime.now().strftime("auto%Y-%m-%dT%H-%M-%S.csv")
-
-    raw_path = FEED_URI_TEMPLATE.format(source=source, filename=output_file)
-    output_path = OUTPUT_FILE_TEMPLATE.format(source=source, filename=output_file)
+    raw_path = output or FEED_URI_TEMPLATE.format(
+        filename=datetime.now().strftime("auto%Y-%m-%dT%H-%M-%S")
+    )
 
     settings = get_project_settings()
     settings["FEED_URI"] = raw_path
-
-    return settings, raw_path, output_path
+    return settings
