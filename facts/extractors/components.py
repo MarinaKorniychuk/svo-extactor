@@ -1,4 +1,5 @@
 import logging
+import re
 
 import numpy as np
 from spacy.attrs import POS, SENT_START, LOWER
@@ -6,7 +7,7 @@ from spacy.matcher import PhraseMatcher
 from spacy.tokens import Doc
 from spacy.util import filter_spans
 
-TOKENS_TO_FILTER = ("PUNCT", "DET", "ADP", "SPACE", "PRON", "PART", "PROPN")
+TOKENS_TO_FILTER = ("PUNCT", "DET", "PRON", "SPACE", "ADV", "X", "PART", "PROPN", "SYM")
 
 FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
@@ -40,10 +41,19 @@ class MergeTermNamesPipeline(object):
         return doc
 
     def add_patterns_to_match(self, terms):
+        terms = self.extend_terms_list(terms)
         patterns = [
             self.nlp(term, disable=["filter", "merge_chunks"]) for term in terms
         ]
         self.phrase_matcher.add("TN", None, *patterns)
+
+    def extend_terms_list(self, terms):
+        new = []
+        pattern = r" \(.*\)"
+        for term in terms:
+            if re.findall(pattern, term):
+                new.append(re.sub(pattern, "", term))
+        return terms + new
 
 
 def remove_tokens_on_match(doc):
