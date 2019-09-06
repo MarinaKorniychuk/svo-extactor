@@ -34,7 +34,8 @@ class MergeTermNamesPipeline(object):
         filtered_spans = filter_spans(matched_spans)
         with doc.retokenize() as retokenizer:
             for span in filtered_spans:
-                retokenizer.merge(span)
+                attrs = {"tag": span.root.tag, "pos": span.root.pos}
+                retokenizer.merge(span, attrs=attrs)
 
         return doc
 

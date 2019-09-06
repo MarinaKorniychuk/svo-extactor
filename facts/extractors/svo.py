@@ -40,7 +40,7 @@ class SVOExtractor(object):
         merge_term_names = MergeTermNamesPipeline(self.nlp)
         merge_term_names.add_patterns_to_match(terms)
 
-        self.nlp.add_pipe(merge_term_names, name="merge_terms", before="tagger")
+        self.nlp.add_pipe(merge_term_names, name="merge_terms", after="tagger")
 
     def process(self, data: Iterable) -> list:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
