@@ -113,3 +113,28 @@ def filter_and_merge_noun_chunks(doc):
             retokenizer.merge(ch, attrs=attrs)
 
     return doc
+
+
+def filter_and_merge_num_noun_chunks(doc):
+    """Filter overlapping spans and merge not to long NOUN chunks
+    that include NUM tokens into a single NOUN token.
+
+    Filter a sequence of spans to remove duplicates or overlaps
+    before merging to avoid conflicting merges.
+    """
+    if not doc.is_parsed:
+        return doc
+
+    chunks = doc.noun_chunks
+    filtered_chunks = filter_spans(chunks)
+    filtered_num_chunks = filter(
+        lambda span: len(span) <= 5 and any(t.pos_ is "NUM" for t in span),
+        filtered_chunks,
+    )
+    with doc.retokenize() as retokenizer:
+        for ch in filtered_num_chunks:
+            # a new token is marked manually as NOUN so that it is not marked as NUM
+            attrs = {"tag": ch.root.tag, "dep": ch.root.dep, "pos": "NOUN"}
+            retokenizer.merge(ch, attrs=attrs)
+
+    return doc
