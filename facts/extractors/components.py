@@ -1,5 +1,4 @@
 import logging
-import re
 
 import numpy as np
 from spacy.attrs import POS, SENT_START, LOWER
@@ -7,7 +6,17 @@ from spacy.matcher import PhraseMatcher
 from spacy.tokens import Doc
 from spacy.util import filter_spans
 
-TOKENS_TO_FILTER = ("PUNCT", "DET", "PRON", "SPACE", "ADV", "X", "PART", "PROPN", "SYM")
+STOP_POS = ["DET", "PRON", "SPACE", "ADV", "X", "PART", "PROPN", "PUNCT", "SYM"]
+NOT_STOP_TAGS = [".", "$", "TO", "PR", "HYPH"]
+
+# "no" determiner doesn't have any special tag to recognize it
+NOT_STOP_TEXT = ["no"]
+
+IS_STOP = (
+    lambda t: t.pos_ in STOP_POS
+    and t.tag_ not in NOT_STOP_TAGS
+    and t.text not in NOT_STOP_TEXT
+)
 
 FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
@@ -35,25 +44,16 @@ class MergeTermNamesPipeline(object):
         filtered_spans = filter_spans(matched_spans)
         with doc.retokenize() as retokenizer:
             for span in filtered_spans:
-                attrs = {"tag": span.root.tag, "pos": span.root.pos}
+                attrs = {"tag": span.root.tag, "pos": "NOUN"}
                 retokenizer.merge(span, attrs=attrs)
 
         return doc
 
     def add_patterns_to_match(self, terms):
-        terms = self.extend_terms_list(terms)
         patterns = [
             self.nlp(term, disable=["filter", "merge_chunks"]) for term in terms
         ]
         self.phrase_matcher.add("TN", None, *patterns)
-
-    def extend_terms_list(self, terms):
-        new = []
-        pattern = r" \(.*\)"
-        for term in terms:
-            if re.findall(pattern, term):
-                new.append(re.sub(pattern, "", term))
-        return terms + new
 
 
 def remove_tokens_on_match(doc):
@@ -62,8 +62,9 @@ def remove_tokens_on_match(doc):
     Note: should be added to pipeline after tagger, but before parser component."""
     indices = []
     for index, token in enumerate(doc):
-        if token.pos_ in TOKENS_TO_FILTER:
+        if IS_STOP(token):
             indices.append(index)
+
             if token.is_sent_start and len(doc) > index + 1:
                 doc[index + 1].is_sent_start = True
 
