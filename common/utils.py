@@ -74,3 +74,8 @@ def get_clean_investopedia_title(title):
         title = re.sub(r, "", title)
 
     return title.strip()
+
+
+def get_term_names(data):
+    """Return lowercase term names extracted from dict with data."""
+    return [i["title"].lower() for i in data]

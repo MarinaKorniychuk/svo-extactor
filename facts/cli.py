@@ -5,7 +5,7 @@ import click
 from scrapy.crawler import CrawlerRunner
 from twisted.internet import reactor
 
-from common.utils import get_settings, get_svo_output_path
+from common.utils import get_settings, get_svo_output_path, get_term_names
 from facts.handlers import CSVHandler
 from facts.extractors import SVOExtractor
 
@@ -46,8 +46,9 @@ def extract(raw_path):
 
     handler = CSVHandler()
     fetched_data = handler.read_from_file(raw_path)
+    terms = get_term_names(fetched_data)
 
-    extractor = SVOExtractor()
+    extractor = SVOExtractor(terms)
     logger.info(f"Starting extracting SVO from: {raw_path}")
     svo_triples = extractor.process(fetched_data)
 

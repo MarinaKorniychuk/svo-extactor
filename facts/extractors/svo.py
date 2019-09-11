@@ -8,47 +8,40 @@ from facts.extractors.components import (
     crop_to_two_sentences,
     remove_tokens_on_match,
     filter_and_merge_num_noun_chunks,
-    MergeTermNamesPipeline,
+    TermNamesRecognizer,
 )
 
 
 class SVOExtractor(object):
     """Extract subject-verb-object triples from data."""
 
-    def __init__(self):
+    def __init__(self, terms):
         """Load and initialize spacy 'en' model,
         add built-in pipeline components for sentence segmentation and merging noun chunks,
         also add to pipeline custom components to crop the paragraph and filter stop words.
 
         Components' order in the pipeline is the following:
-        ['sentencizer', 'crop', 'tagger', 'filter', 'parser', 'merge_num_chunks']
+        ['sentencizer', 'crop', 'tagger', 'merge_terms', 'filter', 'parser', 'merge_num_chunks']
         """
         self.nlp = spacy.load("en_core_web_sm")
         self.nlp.add_pipe(self.nlp.create_pipe("sentencizer"), first=True)
 
         # add custom components to pipeline
         self.nlp.add_pipe(crop_to_two_sentences, name="crop", after="sentencizer")
+
         self.nlp.add_pipe(remove_tokens_on_match, name="filter", after="tagger")
+        merge_term_names = TermNamesRecognizer(self.nlp, terms)
+        self.nlp.add_pipe(merge_term_names, name="merge_terms", after="tagger")
         self.nlp.add_pipe(filter_and_merge_num_noun_chunks, name="merge_num_chunks")
 
         self.nlp.remove_pipe("ner")
 
         self.logger = logging.getLogger("svo-extractor")
 
-    def add_merge_terms_pipeline(self, terms):
-        """Add TermNamesPipeline component to nlp model."""
-        merge_term_names = MergeTermNamesPipeline(self.nlp)
-        merge_term_names.add_patterns_to_match(terms)
-
-        self.nlp.add_pipe(merge_term_names, name="merge_terms", after="tagger")
-
     def process(self, data: Iterable) -> list:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
         self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
         self.logger.info(f"Start extracting SVO triples")
-
-        terms = [i["title"].lower() for i in data]
-        self.add_merge_terms_pipeline(terms)
 
         svo_triples = sum((self.process_item(item) for item in data), [])
 

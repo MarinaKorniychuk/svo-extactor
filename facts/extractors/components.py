@@ -22,19 +22,30 @@ FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
 
 
-class MergeTermNamesPipeline(object):
+class TermNamesRecognizer(object):
     """Custom pipeline component that merges term names into single token.
 
     Find matches for term names in doc and merge them into single token
     to make sure term names will be correctly extracted in SVO triples.
     """
 
-    def __init__(self, nlp):
+    def __init__(self, nlp, terms):
+        """Initialise the pipeline component. The shared nlp instance
+        is used to initialise the matcher with the shared vocab,
+        and generate Doc objects as phrase match patterns.
+        """
         self.nlp = nlp
         self.logger = logging.getLogger("merge-terms-component")
+
+        patterns = [nlp(term, disable=["filter", "merge_num_chunks"]) for term in terms]
         self.phrase_matcher = PhraseMatcher(self.nlp.vocab, LOWER)
+        self.phrase_matcher.add("TN", None, *patterns)
 
     def __call__(self, doc):
+        """Apply the pipeline component on a Doc object and modify it if matches
+        are found. Return the Doc, so it can be processed by the next component
+        in the pipeline, if available.
+        """
         matched_phrases = self.phrase_matcher(doc)
 
         matched_spans = []
@@ -48,12 +59,6 @@ class MergeTermNamesPipeline(object):
                 retokenizer.merge(span, attrs=attrs)
 
         return doc
-
-    def add_patterns_to_match(self, terms):
-        patterns = [
-            self.nlp(term, disable=["filter", "merge_chunks"]) for term in terms
-        ]
-        self.phrase_matcher.add("TN", None, *patterns)
 
 
 def remove_tokens_on_match(doc):
