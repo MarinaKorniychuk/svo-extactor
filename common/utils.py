@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -29,3 +30,19 @@ def get_settings(output=None):
     settings = get_project_settings()
     settings["FEED_URI"] = raw_path
     return settings
+
+
+def get_clear_title(title):
+    """Return page title without unnecessary text."""
+    patterns = [
+        (r"Definition$", ""),
+        (r"Definition and Uses$", ""),
+        (r"Definition and Example$", ""),
+        (r"^The", ""),
+    ]
+
+    for p in patterns:
+        if re.findall(p[0], title):
+            title = re.sub(p[0], p[1], title, flags=re.IGNORECASE)
+
+    return title.strip()

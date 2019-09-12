@@ -1,5 +1,7 @@
 import scrapy
 
+from common.utils import get_clear_title
+
 
 class InvestopediaSpider(scrapy.Spider):
     """Crawl data from Investopedia (https://www.investopedia.com/) Dictionary.
@@ -30,6 +32,8 @@ class InvestopediaSpider(scrapy.Spider):
         text = "".join(response.css(".article-body p")[0].css("p *::text").getall())
         yield {
             "url": response.url,
-            "title": response.css("h1.article-heading::text").get().strip(),
+            "title": get_clear_title(
+                response.css("h1.article-heading::text").get().strip()
+            ),
             "text": text.replace("\xa0", " ").strip(),
         }
