@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-from spacy.attrs import POS, SENT_START, LOWER
+from spacy.attrs import POS, SENT_START, LOWER, TAG
 from spacy.matcher import PhraseMatcher
 from spacy.tokens import Doc
 from spacy.util import filter_spans
@@ -18,7 +18,7 @@ IS_STOP = (
     and t.text not in NOT_STOP_TEXT
 )
 
-FILTER_ATTRS_TO_EXPORT = [POS, SENT_START]
+FILTER_ATTRS_TO_EXPORT = [POS, SENT_START, TAG]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
 
 
