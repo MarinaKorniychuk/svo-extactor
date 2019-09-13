@@ -4,6 +4,7 @@ from typing import Iterable
 import spacy
 import textacy.extract
 
+from common.utils import get_clean_text
 from facts.extractors.components import (
     crop_to_two_sentences,
     remove_tokens_on_match,
@@ -59,7 +60,7 @@ class SVOExtractor(object):
         - URL of the definition page
         - the original full text of the definition
         """
-        text = item["text"].replace("“", '"').replace("”", '"').lower()
+        text = get_clean_text(item["text"])
         doc = self.nlp(text)
 
         svo_triples = []
