@@ -6,6 +6,40 @@ from scrapy.utils.project import get_project_settings
 
 from facts.settings import FEED_URI_TEMPLATE
 
+PATTERNS_TO_REMOVE = [
+    "^Who is ",
+    "^What is ",
+    "^What was ",
+    "^What does ",
+    "^What Defines a ",
+    ": The Complete Guide$",
+    "Definition & Explanation$",
+    "Explanation$",
+    "Definition and Uses$",
+    "Definition and Levels$",
+    "Definition and Example$",
+    "Definition and Tactics$",
+    "Definition and Applications$",
+    "Definition and Application$",
+    "Definition and Trading Uses$",
+    "Defining the$",
+    "Defining an$",
+    "Defining a$",
+    "Defining$",
+    "Defined$",
+    "- Definition$",
+    "– Definition$",
+    "Definition",
+    " in Finance$",
+    " in Finance\?$",
+    "^The ",
+    "^An ",
+    "^A ",
+    "\?$",
+]
+
+COMPILED_REGEXES = [re.compile(p, re.IGNORECASE) for p in PATTERNS_TO_REMOVE]
+
 
 def get_svo_output_path(path):
     """Return output_path that is destination for extracted SVO triples."""
@@ -34,36 +68,8 @@ def get_settings(output=None):
 
 def get_clear_title(title):
     """Return page title without unnecessary text."""
-    patterns = [
-        (r"^Who is ", ""),
-        (r"^What is ", ""),
-        (r"^What was ", ""),
-        (r"^What does ", ""),
-        (r"^What Defines a  ", ""),
-        (r"Definition and Uses$", ""),
-        (r"Definition and Levels$", ""),
-        (r"Definition and Example$", ""),
-        (r"Definition and Tactics$", ""),
-        (r"Definition and Applications$", ""),
-        (r"Definition and Application$", ""),
-        (r"Definition and Trading Uses$", ""),
-        (r"Defining the$", ""),
-        (r"Defining an$", ""),
-        (r"Defining a$", ""),
-        (r"Defining$", ""),
-        (r"Defined$", ""),
-        (r"- Definition$", ""),
-        (r"– Definition$", ""),
-        (r"Definition", ""),
-        (r" in Finance$", ""),
-        (r"^The ", ""),
-        (r"^An ", ""),
-        (r"^A ", ""),
-        (r"\?$", ""),
-    ]
 
-    for p in patterns:
-        if re.findall(p[0], title, flags=re.IGNORECASE):
-            title = re.sub(p[0], p[1], title, flags=re.IGNORECASE)
+    for r in COMPILED_REGEXES:
+        title = re.sub(r, "", title)
 
     return title.strip()
