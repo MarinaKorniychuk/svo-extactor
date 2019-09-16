@@ -6,6 +6,9 @@ from scrapy.utils.project import get_project_settings
 
 from facts.settings import FEED_URI_TEMPLATE
 
+BRACKETS_REGEX = re.compile(" \(.*?\)")
+ABBR_REGEX = re.compile(" [—–] [\w/&]+|[—–][a-z]+")
+
 PATTERNS_TO_REMOVE = [
     "^Who is ",
     "^What is ",
@@ -77,5 +80,15 @@ def get_clean_investopedia_title(title):
 
 
 def get_term_names(data):
-    """Return lowercase term names extracted from dict with data."""
-    return [i["title"].lower() for i in data]
+    """Return lowercase term names without brackets and their content."""
+    return [get_clean_text(i["title"]) for i in data]
+
+
+def get_clean_text(text):
+    """Return lowercase text without brackets and their content."""
+    text = text.replace("“", '"').replace("”", '"').lower()
+
+    for r in [BRACKETS_REGEX, ABBR_REGEX]:
+        text = re.sub(r, "", text)
+
+    return text
