@@ -1,9 +1,12 @@
 from unittest import TestCase
 
-import pytest
 import spacy
 
-from facts.extractors.components import remove_tokens_on_match, crop_to_two_sentences, IS_STOP
+from facts.extractors.components import (
+    remove_tokens_on_match,
+    crop_to_two_sentences,
+    IS_STOP,
+)
 
 LONG_TEXT = (
     "3c1 refers to a portion of the investment company act of 1940 that allows private funds to "
