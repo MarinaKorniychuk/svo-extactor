@@ -80,12 +80,12 @@ def get_clean_investopedia_title(title):
 
 
 def get_term_names(data):
-    """Return lowercase term names without brackets and their content."""
+    """Return lowercase cleaned term names."""
     return [get_clean_text(i["title"]) for i in data]
 
 
 def get_clean_text(text):
-    """Return lowercase text without brackets and their content."""
+    """Return lowercase text without brackets and unnecessary abbreviations."""
     text = text.replace("“", '"').replace("”", '"').lower()
 
     for r in [BRACKETS_REGEX, ABBR_REGEX]:
