@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from common.tests import spider, fake_response_redirect
+from common.tests import spider
 from facts.spiders import InvestopediaSpider
 
 
@@ -27,12 +27,3 @@ class InvestopediaSpiderTestCase(spider.SpiderTestCase):
             "2000, many investors, because of their large losses, were said to have taken a bath.",
             item["text"],
         )
-
-    def test_parse_detail_redirect(self):
-        results = self.spider.parse_detail(
-            fake_response_redirect(
-                "https://www.investopedia.com/terms/1/90-age-formula.asp"
-            )
-        )
-        for item in results:
-            self.assertIsNone(item)
