@@ -12,12 +12,6 @@ NOT_STOP_TAGS = ["$", "TO", "PR"]
 # "no" determiner doesn't have any special tag to recognize it
 NOT_STOP_TEXT = ["no"]
 
-IS_STOP = (
-    lambda t: t.pos_ in STOP_POS
-    and t.tag_ not in NOT_STOP_TAGS
-    and t.text not in NOT_STOP_TEXT
-)
-
 FILTER_ATTRS_TO_EXPORT = [POS, SENT_START, TAG]
 CROP_ATTRS_TO_EXPORT = [SENT_START]
 
@@ -61,13 +55,22 @@ class TermNamesRecognizer(object):
         return doc
 
 
+def is_stop_token(token):
+    """Return bool value indicates whether a token is a stop word and should be removed."""
+    return (
+        token.pos_ in STOP_POS
+        and token.tag_ not in NOT_STOP_TAGS
+        and token.text not in NOT_STOP_TEXT
+    )
+
+
 def remove_tokens_on_match(doc):
     """Filter out stop word tokens, while maintaining sentences boundaries.
 
     Note: should be added to pipeline after tagger, but before parser component."""
     indices = []
     for index, token in enumerate(doc):
-        if IS_STOP(token):
+        if is_stop_token(token):
             indices.append(index)
 
             if token.is_sent_start and len(doc) > index + 1:

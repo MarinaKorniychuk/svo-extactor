@@ -5,7 +5,7 @@ import spacy
 from facts.extractors.components import (
     remove_tokens_on_match,
     crop_to_two_sentences,
-    IS_STOP,
+    is_stop_token,
 )
 
 LONG_TEXT = (
@@ -59,4 +59,4 @@ class TestFilteringStopTokens(TestCase):
     def test_remove_stop_tokens(self):
         filtered_doc = self.nlp(LONG_TEXT)
         for token in filtered_doc:
-            self.assertFalse(IS_STOP(token))
+            self.assertFalse(is_stop_token(token))

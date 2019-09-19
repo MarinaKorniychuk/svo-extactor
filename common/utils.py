@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Iterable, Generator
 
 from scrapy.utils.project import get_project_settings
 
@@ -17,7 +18,7 @@ PATTERNS_TO_REMOVE = [
     "^What Defines a ",
     ": The Complete Guide$",
     "Definition & Explanation$",
-    "Explanation$",
+    "Explanation",
     "Definition and Uses$",
     "Definition and Levels$",
     "Definition and Example$",
@@ -25,10 +26,10 @@ PATTERNS_TO_REMOVE = [
     "Definition and Applications$",
     "Definition and Application$",
     "Definition and Trading Uses$",
-    "Defining the$",
-    "Defining an$",
-    "Defining a$",
-    "Defining$",
+    "^Defining the",
+    "^Defining an",
+    "^Defining a",
+    "^Defining",
     "Defined$",
     "- Definition$",
     "– Definition$",
@@ -79,9 +80,10 @@ def get_clean_investopedia_title(title):
     return title.strip()
 
 
-def get_term_names(data):
-    """Return lowercase cleaned term names."""
-    return [get_clean_text(i["title"]) for i in data]
+def get_term_names(data: Iterable) -> Generator:
+    """Yield lowercase cleaned term names extracted from each item dict in data."""
+    for i in data:
+        yield get_clean_text(i["title"])
 
 
 def get_clean_text(text):
