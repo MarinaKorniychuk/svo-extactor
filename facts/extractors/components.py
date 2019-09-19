@@ -6,9 +6,8 @@ from spacy.matcher import PhraseMatcher
 from spacy.tokens import Doc
 from spacy.util import filter_spans
 
-STOP_POS = ["DET", "PRON", "SPACE", "ADV", "X", "PART", "PROPN", "PUNCT", "SYM", "ADP"]
-NOT_STOP_TAGS = ["$", "TO", "PR"]
-
+STOP_POS = ["DET", "PRON", "SPACE", "ADV", "X", "PART", "PROPN", "PUNCT", "SYM"]
+NOT_STOP_TAGS = ["$", "TO", "PR", "WDT"]
 # "no" determiner doesn't have any special tag to recognize it
 NOT_STOP_TEXT = ["no"]
 

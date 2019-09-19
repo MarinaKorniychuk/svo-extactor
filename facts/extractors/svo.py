@@ -65,7 +65,7 @@ class SVOExtractor(object):
 
         svo_triples = []
         for svo in textacy.extract.subject_verb_object_triples(doc):
-            if svo[0].root.pos_ == "VERB" or svo[2].root.pos_ == "VERB":
+            if svo[0].root.pos_ in ["VERB", "DET", "ADP"] or svo[2].root.pos_ == "VERB":
                 continue
             svo_triples.append(
                 {
