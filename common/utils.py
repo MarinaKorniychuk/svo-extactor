@@ -35,6 +35,7 @@ PATTERNS_TO_REMOVE = [
     "– Definition$",
     "Definition",
     "Defintion",
+    "Definiton",
     " in Finance$",
     " in Finance\?$",
     "^The ",
