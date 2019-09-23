@@ -46,10 +46,11 @@ def extract(raw_path):
 
     handler = CSVHandler()
     fetched_data = handler.read_from_file(raw_path)
+    logger.info(f"Extracting term names to initialize SVO extractor...")
     terms = get_term_names(fetched_data)
 
     extractor = SVOExtractor(terms)
-    logger.info(f"Starting extracting SVO from: {raw_path}")
+    logger.info(f"Star extracting SVO from: {raw_path}")
     svo_triples = extractor.process(fetched_data)
 
     handler.export_to_file(svo_triples, output_path)

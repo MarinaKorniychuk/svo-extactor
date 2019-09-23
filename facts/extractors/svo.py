@@ -42,7 +42,7 @@ class SVOExtractor(object):
     def process(self, data: Iterable) -> list:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
         self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
-        self.logger.info(f"Start extracting SVO triples")
+        self.logger.info(f"Extracting SVO triples")
 
         svo_triples = sum((self.process_item(item) for item in data), [])
 
