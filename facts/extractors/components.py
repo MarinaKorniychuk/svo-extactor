@@ -142,7 +142,12 @@ def filter_and_merge_num_noun_chunks(doc):
     with doc.retokenize() as retokenizer:
         for ch in filtered_num_chunks:
             # a new token is marked manually as NOUN so that it is not marked as NUM
-            attrs = {"tag": ch.root.tag, "dep": ch.root.dep, "pos": "NOUN"}
+            attrs = {
+                "tag": ch.root.tag,
+                "dep": ch.root.dep,
+                "pos": "NOUN",
+                "lemma": doc.vocab.strings[ch.text],
+            }
             retokenizer.merge(ch, attrs=attrs)
 
     return doc
