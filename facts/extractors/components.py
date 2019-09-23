@@ -103,9 +103,9 @@ def crop_to_two_sentences(doc):
 
 
 def filter_and_merge_noun_chunks(doc):
-    """Filter overlapping spans and merge noun chunks into a single token.
+    """Filter overlapping spans and merge NOUN chunks that include NUM tokens
+    and other NOUN chunks with limited length into a single NOUN token.
 
-    Component to replace build-in pipeline component merge_noun_chunks.
     Filter a sequence of spans to remove duplicates or overlaps
     before merging to avoid conflicting merges.
     """
@@ -117,37 +117,14 @@ def filter_and_merge_noun_chunks(doc):
 
     with doc.retokenize() as retokenizer:
         for ch in filtered_chunks:
-            attrs = {"tag": ch.root.tag, "dep": ch.root.dep, "pos": ch.root.pos}
-            retokenizer.merge(ch, attrs=attrs)
-
-    return doc
-
-
-def filter_and_merge_num_noun_chunks(doc):
-    """Filter overlapping spans and merge not to long NOUN chunks
-    that include NUM tokens into a single NOUN token.
-
-    Filter a sequence of spans to remove duplicates or overlaps
-    before merging to avoid conflicting merges.
-    """
-    if not doc.is_parsed:
-        return doc
-
-    chunks = doc.noun_chunks
-    filtered_chunks = filter_spans(chunks)
-    filtered_num_chunks = filter(
-        lambda span: len(span) <= 5 and any(t.pos_ is "NUM" for t in span),
-        filtered_chunks,
-    )
-    with doc.retokenize() as retokenizer:
-        for ch in filtered_num_chunks:
-            # a new token is marked manually as NOUN so that it is not marked as NUM
-            attrs = {
-                "tag": ch.root.tag,
-                "dep": ch.root.dep,
-                "pos": "NOUN",
-                "lemma": doc.vocab.strings[ch.text],
-            }
-            retokenizer.merge(ch, attrs=attrs)
+            if (any(t.pos_ is "NUM" for t in ch) and len(ch) <= 5) or len(ch) <= 2:
+                # a new token is marked manually as NOUN so that it is not marked as NUM
+                attrs = {
+                    "tag": ch.root.tag,
+                    "dep": ch.root.dep,
+                    "pos": "NOUN",
+                    "lemma": doc.vocab.strings[ch.text],
+                }
+                retokenizer.merge(ch, attrs=attrs)
 
     return doc

@@ -8,7 +8,7 @@ from common.utils import get_clean_text
 from facts.extractors.components import (
     crop_to_two_sentences,
     remove_tokens_on_match,
-    filter_and_merge_num_noun_chunks,
+    filter_and_merge_noun_chunks,
     TermNamesRecognizer,
 )
 
@@ -22,7 +22,7 @@ class SVOExtractor(object):
         also add to pipeline custom components to crop the paragraph and filter stop words.
 
         Components' order in the pipeline is the following:
-        ['sentencizer', 'crop', 'tagger', 'merge_terms', 'filter', 'parser', 'merge_num_chunks']
+        ['sentencizer', 'crop', 'tagger', 'merge_terms', 'filter', 'parser', 'merge_noun_chunks']
         """
         self.nlp = spacy.load("en_core_web_sm")
         self.nlp.add_pipe(self.nlp.create_pipe("sentencizer"), first=True)
@@ -33,7 +33,7 @@ class SVOExtractor(object):
         self.nlp.add_pipe(remove_tokens_on_match, name="filter", after="tagger")
         merge_term_names = TermNamesRecognizer(self.nlp, terms)
         self.nlp.add_pipe(merge_term_names, name="merge_terms", after="tagger")
-        self.nlp.add_pipe(filter_and_merge_num_noun_chunks, name="merge_num_chunks")
+        self.nlp.add_pipe(filter_and_merge_noun_chunks, name="merge_noun_chunks")
 
         self.nlp.remove_pipe("ner")
 
