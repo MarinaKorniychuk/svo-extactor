@@ -117,7 +117,8 @@ def filter_and_merge_noun_chunks(doc):
 
     with doc.retokenize() as retokenizer:
         for ch in filtered_chunks:
-            if (any(t.pos_ is "NUM" for t in ch) and len(ch) <= 5) or len(ch) <= 2:
+            chunk_has_number = any(t.pos_ is "NUM" for t in ch)
+            if (chunk_has_number and len(ch) <= 5) or len(ch) <= 2:
                 # a new token is marked manually as NOUN so that it is not marked as NUM
                 attrs = {
                     "tag": ch.root.tag,

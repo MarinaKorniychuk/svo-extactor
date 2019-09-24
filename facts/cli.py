@@ -50,7 +50,7 @@ def extract(raw_path):
     terms = get_term_names(fetched_data)
 
     extractor = SVOExtractor(terms)
-    logger.info(f"Star extracting SVO from: {raw_path}")
+    logger.info(f"Start extracting SVO from: {raw_path}")
     svo_triples = extractor.process(fetched_data)
 
     handler.export_to_file(svo_triples, output_path)
