@@ -1,9 +1,10 @@
 import logging
-from typing import Iterable
+from typing import List
 
 import spacy
 import textacy.extract
 
+from common.typing import SVOData, RawData, RawItem
 from common.utils import get_clean_text
 from facts.extractors.components import (
     crop_to_two_sentences,
@@ -16,7 +17,7 @@ from facts.extractors.components import (
 class SVOExtractor(object):
     """Extract subject-verb-object triples from data."""
 
-    def __init__(self, terms):
+    def __init__(self, terms: List[str]):
         """Load and initialize spacy 'en' model,
         add built-in pipeline components for sentence segmentation and merging noun chunks,
         also add to pipeline custom components to crop the paragraph and filter stop words.
@@ -39,7 +40,7 @@ class SVOExtractor(object):
 
         self.logger = logging.getLogger("svo-extractor")
 
-    def process(self, data: Iterable) -> list:
+    def process(self, data: RawData) -> SVOData:
         """Call extracting SVO triples for each item in the data and aggregate the results."""
         self.logger.info(f"Got data ({len(data)} items) to extract SVO triples")
         self.logger.info(f"Extracting SVO triples")
@@ -49,7 +50,7 @@ class SVOExtractor(object):
         self.logger.info(f"Finished extracting SVO triples from data")
         return svo_triples
 
-    def process_item(self, item: dict) -> list:
+    def process_item(self, item: RawItem) -> SVOData:
         """Run the text through nlp spacy model to extract SVO triples.
         For each SVO create dict with the following data:
 

@@ -1,10 +1,11 @@
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Generator
+from typing import Generator
 
 from scrapy.utils.project import get_project_settings
 
+from common.typing import RawData
 from facts.settings import FEED_URI_TEMPLATE
 
 BRACKETS_REGEX = re.compile(" \(.*?\)")
@@ -81,8 +82,8 @@ def get_clean_investopedia_title(title):
     return title.strip()
 
 
-def get_term_names(data: Iterable) -> Generator:
-    """Yield lowercase cleaned term names extracted from each item dict in data."""
+def get_term_names(data: RawData) -> Generator[str, None, None]:
+    """Yield lowercase cleaned term names extracted from each item dict by "title" key."""
     for i in data:
         yield get_clean_text(i["title"])
 

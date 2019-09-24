@@ -9,6 +9,7 @@ python = "^3.7"
 click = "^7.0"
 scrapy = "^1.7"
 textacy = "^0.8.0"
+mypy_extensions = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
