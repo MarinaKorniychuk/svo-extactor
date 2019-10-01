@@ -28,7 +28,6 @@ class TermNamesRecognizer(object):
         and generate Doc objects as phrase match patterns.
         """
         self.nlp = nlp
-        self.logger = logging.getLogger("merge-terms-component")
 
         patterns = [nlp(term, disable=["filter", "merge_num_chunks"]) for term in terms]
         self.phrase_matcher = PhraseMatcher(self.nlp.vocab, LOWER)
