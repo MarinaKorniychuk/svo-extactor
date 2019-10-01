@@ -41,6 +41,6 @@ class BlacksLawSpider(scrapy.Spider):
         text = "".join(response.css(".entry p")[0].css("*::text").getall())
         yield {
             "url": response.url,
-            "title": response.css("h1.title b::text").get().lower().strip(),
-            "text": text.replace("\xa0", " ").strip(),
+            "title": response.css("h1.title b::text").get().replace("\n", " ").lower(),
+            "text": text.replace("\xa0", " ").replace("\n", " ").strip(),
         }
