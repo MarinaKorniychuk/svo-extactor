@@ -118,12 +118,13 @@ def filter_and_merge_noun_chunks(doc):
         for ch in filtered_chunks:
             chunk_has_number = any(t.pos_ is "NUM" for t in ch)
             if (chunk_has_number and len(ch) <= 5) or len(ch) <= 2:
+                lemma = ch.root.lemma_ if len(ch) == 1 else doc.vocab.strings[ch.text]
                 # a new token is marked manually as NOUN so that it is not marked as NUM
                 attrs = {
                     "tag": ch.root.tag,
                     "dep": ch.root.dep,
                     "pos": "NOUN",
-                    "lemma": doc.vocab.strings[ch.text],
+                    "lemma": lemma,
                 }
                 retokenizer.merge(ch, attrs=attrs)
 
