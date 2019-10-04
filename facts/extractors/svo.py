@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Generator
 
 import spacy
 import textacy.extract
@@ -17,7 +17,7 @@ from facts.extractors.components import (
 class SVOExtractor(object):
     """Extract subject-verb-object triples from data."""
 
-    def __init__(self, terms: List[str]):
+    def __init__(self, terms: Generator[str, None, None]):
         """Load and initialize spacy 'en' model,
         add built-in pipeline components for sentence segmentation and merging noun chunks,
         also add to pipeline custom components to crop the paragraph and filter stop words.

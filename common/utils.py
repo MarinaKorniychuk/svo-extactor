@@ -47,6 +47,23 @@ PATTERNS_TO_REMOVE = [
 
 COMPILED_REGEXES = [re.compile(p, re.IGNORECASE) for p in PATTERNS_TO_REMOVE]
 
+NOT_TERMS = [
+    "an",
+    "the",
+    "to",
+    "as",
+    "many",
+    "all",
+    "so",
+    "either",
+    "i e",
+    "this",
+    "every",
+    "for",
+    "he",
+    "do",
+]
+
 
 def get_svo_output_path(path):
     """Return output_path that is destination for extracted SVO triples."""
@@ -83,9 +100,13 @@ def get_clean_investopedia_title(title):
 
 
 def get_term_names(data: RawData) -> Generator[str, None, None]:
-    """Yield lowercase cleaned term names extracted from each item dict by "title" key."""
+    """Yield lowercase cleaned term names extracted from each item dict by "title" key.
+    Skip titles that are not terms and titles with definitions for verb terms.
+    """
     for i in data:
-        yield get_clean_text(i["title"])
+        is_noun_term = i["title"] not in NOT_TERMS and not i["text"].startswith("To ")
+        if is_noun_term:
+            yield get_clean_text(i["title"])
 
 
 def get_clean_text(text):
