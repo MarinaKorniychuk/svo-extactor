@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Generator
 
+from bs4 import BeautifulSoup
 from scrapy.utils.project import get_project_settings
 
 from common.typing import RawData
@@ -117,3 +118,8 @@ def get_clean_text(text):
         text = re.sub(r, "", text)
 
     return text
+
+
+def remove_html_markups(content: str) -> str:
+    """Remove html tags from content and return text only."""
+    return BeautifulSoup(content, "html.parser").text.strip()

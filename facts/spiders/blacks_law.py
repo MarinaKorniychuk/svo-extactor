@@ -1,5 +1,7 @@
 import scrapy
 
+from common.utils import remove_html_markups
+
 
 class BlacksLawSpider(scrapy.Spider):
     """Crawl data from The Law Dictionary (https://thelawdictionary.org/).
@@ -38,7 +40,9 @@ class BlacksLawSpider(scrapy.Spider):
             )
             return
 
-        text = "".join(response.css(".entry p")[0].css("*::text").getall())
+        html = response.css(".entry p")[0].get().split("<!--")[0]
+        text = remove_html_markups(html)
+
         yield {
             "url": response.url,
             "title": response.css("h1.title b::text").get().replace("\n", " ").lower(),
