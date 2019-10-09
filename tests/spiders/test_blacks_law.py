@@ -12,6 +12,11 @@ class BlacksLawSpiderTestCase(spider.SpiderTestCase):
     )
     url = "https://thelawdictionary.org/data-processing-insurance"
 
+    def get_local_response(self):
+        response = super().get_local_response()
+        response.meta["title"] = "data processing insurance"
+        return response
+
     def check_results(self, results):
         self.assertEqual(1, len(results))
 
