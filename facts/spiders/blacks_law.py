@@ -24,8 +24,12 @@ class BlacksLawSpider(scrapy.Spider):
     def parse_list(self, response):
         """Parse a response from "Archive | [symbol]" page."""
 
-        for detail_link in response.css(".type-post a"):
-            yield response.follow(url=detail_link, callback=self.parse_detail)
+        for detail_link in response.css(".type-post a[title]"):
+            yield response.follow(
+                url=detail_link,
+                callback=self.parse_detail,
+                meta={"title": detail_link.attrib["title"]},
+            )
 
         next_page_url = response.css("a.next::attr(href)").get()
 
@@ -34,7 +38,7 @@ class BlacksLawSpider(scrapy.Spider):
 
     def parse_detail(self, response):
         """Parse a response from term Detail page."""
-        if not response.css("h1.title b"):
+        if not response.xpath('.//div[contains(text(), "Link to This Definition")]'):
             self.logger.warning(
                 f"No definition for a term from <GET {response.url}>: SKIPPING"
             )
@@ -45,6 +49,6 @@ class BlacksLawSpider(scrapy.Spider):
 
         yield {
             "url": response.url,
-            "title": response.css("h1.title b::text").get().replace("\n", " ").lower(),
+            "title": response.meta["title"].replace("\n", " ").lower(),
             "text": text.replace("\xa0", " ").replace("\n", " ").strip(),
         }
