@@ -1,10 +1,15 @@
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Generator
 
 from scrapy.utils.project import get_project_settings
 
+from common.typing import RawData
 from facts.settings import FEED_URI_TEMPLATE
+
+BRACKETS_REGEX = re.compile(" \(.*?\)")
+ABBR_REGEX = re.compile(" [—–] [\w/&]+|[—–][a-z]+")
 
 PATTERNS_TO_REMOVE = [
     "^Who is ",
@@ -14,7 +19,7 @@ PATTERNS_TO_REMOVE = [
     "^What Defines a ",
     ": The Complete Guide$",
     "Definition & Explanation$",
-    "Explanation$",
+    "Explanation",
     "Definition and Uses$",
     "Definition and Levels$",
     "Definition and Example$",
@@ -22,15 +27,16 @@ PATTERNS_TO_REMOVE = [
     "Definition and Applications$",
     "Definition and Application$",
     "Definition and Trading Uses$",
-    "Defining the$",
-    "Defining an$",
-    "Defining a$",
-    "Defining$",
+    "^Defining the",
+    "^Defining an",
+    "^Defining a",
+    "^Defining",
     "Defined$",
     "- Definition$",
     "– Definition$",
     "Definition",
     "Defintion",
+    "Definiton",
     " in Finance$",
     " in Finance\?$",
     "^The ",
@@ -40,6 +46,23 @@ PATTERNS_TO_REMOVE = [
 ]
 
 COMPILED_REGEXES = [re.compile(p, re.IGNORECASE) for p in PATTERNS_TO_REMOVE]
+
+NOT_TERMS = [
+    "an",
+    "the",
+    "to",
+    "as",
+    "many",
+    "all",
+    "so",
+    "either",
+    "i e",
+    "this",
+    "every",
+    "for",
+    "he",
+    "do",
+]
 
 
 def get_svo_output_path(path):
@@ -74,3 +97,23 @@ def get_clean_investopedia_title(title):
         title = re.sub(r, "", title)
 
     return title.strip()
+
+
+def get_term_names(data: RawData) -> Generator[str, None, None]:
+    """Yield lowercase cleaned term names extracted from each item dict by "title" key.
+    Skip titles that are not terms and titles with definitions for verb terms.
+    """
+    for i in data:
+        is_noun_term = i["title"] not in NOT_TERMS and not i["text"].startswith("To ")
+        if is_noun_term:
+            yield get_clean_text(i["title"])
+
+
+def get_clean_text(text):
+    """Return lowercase text without brackets and unnecessary abbreviations."""
+    text = text.replace("“", '"').replace("”", '"').lower()
+
+    for r in [BRACKETS_REGEX, ABBR_REGEX]:
+        text = re.sub(r, "", text)
+
+    return text

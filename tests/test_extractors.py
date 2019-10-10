@@ -25,7 +25,8 @@ data = [
 
 class ExtractorSVOTestCase(TestCase):
     def setUp(self):
-        self.extractor = SVOExtractor()
+        terms = ["Financial Accounting", "Balance Sheet Reserves"]
+        self.extractor = SVOExtractor(terms)
 
     def test_svo_extraction(self):
         keys = ["name", "subject", "verb", "object", "url", "definition"]
